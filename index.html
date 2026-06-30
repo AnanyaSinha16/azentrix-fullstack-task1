@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal Budget Tracker - A premium dashboard to track your daily income, expenses, budgets, and savings.">
+  <title>AuraBudget | Premium Personal Finance Tracker</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="/style.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+  <!-- Application Shell -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i data-lucide="wallet" class="logo-icon"></i>
+          <span class="logo-text">Aura<span class="highlight">Budget</span></span>
+        </div>
+        <button class="close-sidebar-btn" id="closeSidebarBtn" aria-label="Close sidebar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <button class="nav-link active" id="navDashboard" data-tab="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-link" id="navTransactions" data-tab="transactions">
+          <i data-lucide="arrow-right-left"></i>
+          <span>Transactions</span>
+        </button>
+        <button class="nav-link" id="navBudgetSettings" data-tab="budget-settings">
+          <i data-lucide="sliders"></i>
+          <span>Budget & Goals</span>
+        </button>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button class="btn btn-outline btn-block" id="btnExportCSV">
+          <i data-lucide="download"></i>
+          <span>Export Backup</span>
+        </button>
+        <button class="btn btn-outline btn-block" id="btnTriggerImport">
+          <i data-lucide="upload"></i>
+          <span>Import Backup</span>
+        </button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+        
+        <div class="theme-info">
+          <span>AuraBudget v1.0</span>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open sidebar">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="greeting-container">
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <p class="subtitle" id="pageSubtitle">Welcome back! Here's your financial snapshot.</p>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <!-- Month/Year Filter Selection -->
+          <div class="date-selector-wrapper">
+            <i data-lucide="calendar" class="calendar-icon"></i>
+            <select id="headerMonthFilter" class="select-input" aria-label="Select month filter">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          
+          <button class="btn btn-primary" id="btnOpenAddModal">
+            <i data-lucide="plus"></i>
+            <span>Add Transaction</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- TAB CONTENTS -->
+      <div class="tab-container">
+        
+        <!-- ================= DASHBOARD TAB ================= -->
+        <section class="tab-content active" id="tabDashboard">
+          
+          <!-- Key Metrics Grid -->
+          <div class="metrics-grid">
+            <!-- Balance Card -->
+            <div class="metric-card balance-card">
+              <div class="card-icon-wrapper">
+                <i data-lucide="banknote"></i>
+              </div>
+              <div class="metric-data">
+                <span class="metric-label">Net Balance</span>
+                <h2 class="metric-value" id="valNetBalance">$0.00</h2>
+              </div>
+              <div class="metric-trend" id="trendBalance">
+                <i data-lucide="trending-up"></i>
+                <span class="trend-text">All time statistics</span>
+              </div>
+            </div>
+            
+            <!-- Income Card -->
+            <div class="metric-card income-card">
+              <div class="card-icon-wrapper">
+                <i data-lucide="arrow-down-left"></i>
+              </div>
+              <div class="metric-data">
+                <span class="metric-label">Total Income</span>
+                <h2 class="metric-value text-emerald" id="valTotalIncome">$0.00</h2>
+              </div>
+              <div class="metric-trend" id="trendIncome">
+                <span class="trend-text">This Month</span>
+              </div>
+            </div>
+            
+            <!-- Expenses Card -->
+            <div class="metric-card expense-card">
+              <div class="card-icon-wrapper">
+                <i data-lucide="arrow-up-right"></i>
+              </div>
+              <div class="metric-data">
+                <span class="metric-label">Total Expenses</span>
+                <h2 class="metric-value text-rose" id="valTotalExpenses">$0.00</h2>
+              </div>
+              <div class="metric-trend" id="trendExpense">
+                <span class="trend-text">This Month</span>
+              </div>
+            </div>
+            
+            <!-- Savings Rate Card -->
+            <div class="metric-card savings-card">
+              <div class="card-icon-wrapper">
+                <i data-lucide="piggy-bank"></i>
+              </div>
+              <div class="metric-data">
+                <span class="metric-label">Savings Rate</span>
+                <h2 class="metric-value text-violet" id="valSavingsRate">0%</h2>
+              </div>
+              <div class="metric-trend" id="trendSavings">
+                <div class="progress-bar-container">
+                  <div class="progress-bar" id="savingsRateProgress" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Budget Alert Banner (Hidden by default, shown if close to limit) -->
+          <div class="budget-alert-banner alert-hidden" id="budgetAlertBanner">
+            <div class="alert-content">
+              <i data-lucide="alert-triangle" class="alert-icon"></i>
+              <div class="alert-message">
+                <strong id="alertBannerTitle">Warning: Budget Threshold Exceeded!</strong>
+                <span id="alertBannerText">You have spent 85% of your monthly budget limit.</span>
+              </div>
+            </div>
+            <button class="alert-close-btn" id="btnCloseAlertBanner" aria-label="Dismiss alert">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          
+          <!-- Charts Section Grid -->
+          <div class="charts-grid">
+            <!-- Chart Card: Income vs Expense Trend -->
+            <div class="chart-card glass-panel">
+              <div class="chart-header">
+                <h3>Monthly Trend</h3>
+                <span class="chart-subtitle">Income vs Expenses over time</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Chart Card: Expense Breakdown -->
+            <div class="chart-card glass-panel">
+              <div class="chart-header">
+                <h3>Expense Breakdown</h3>
+                <span class="chart-subtitle">Categories distribution for selected month</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Budget Limit Dashboard Widget -->
+          <div class="budget-progress-section glass-panel">
+            <div class="section-header">
+              <div class="header-info">
+                <h3>Monthly Budget Tracker</h3>
+                <p class="section-subtitle">Track your spending against your monthly target</p>
+              </div>
+              <div class="budget-values">
+                <span id="budgetSpentVal">$0.00</span> / <strong id="budgetLimitVal">$1,000.00</strong>
+              </div>
+            </div>
+            <div class="budget-progress-bar-wrapper">
+              <div class="budget-progress-bar" id="budgetProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="budget-status-text" id="budgetStatusText">
+              Set a budget in the settings to track your monthly spending.
+            </div>
+          </div>
+          
+          <!-- Recent Transactions Preview -->
+          <div class="recent-transactions-section glass-panel">
+            <div class="section-header">
+              <h3>Recent Transactions</h3>
+              <button class="btn btn-text" id="btnViewAllTransactions">
+                <span>View All</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th class="text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactionsTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+        </section>
+        
+        <!-- ================= TRANSACTIONS TAB ================= -->
+        <section class="tab-content" id="tabTransactions">
+          
+          <!-- Filters Toolbar -->
+          <div class="filters-toolbar glass-panel">
+            <div class="search-box">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="searchTxInput" placeholder="Search description..." aria-label="Search transactions">
+            </div>
+            
+            <div class="filter-actions-group">
+              <div class="filter-item">
+                <label for="filterType">Type</label>
+                <select id="filterType" class="select-input">
+                  <option value="all">All Types</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </div>
+              
+              <div class="filter-item">
+                <label for="filterCategory">Category</label>
+                <select id="filterCategory" class="select-input">
+                  <option value="all">All Categories</option>
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              
+              <div class="filter-item">
+                <label for="filterSort">Sort By</label>
+                <select id="filterSort" class="select-input">
+                  <option value="date-desc">Date (Newest)</option>
+                  <option value="date-asc">Date (Oldest)</option>
+                  <option value="amount-desc">Amount (Highest)</option>
+                  <option value="amount-asc">Amount (Lowest)</option>
+                </select>
+              </div>
+              
+              <button class="btn btn-secondary btn-icon-only" id="btnClearFilters" title="Clear Filters" aria-label="Clear all filters">
+                <i data-lucide="rotate-ccw"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Transactions Ledger Table -->
+          <div class="transactions-ledger-container glass-panel">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th class="text-right">Amount</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="fullTransactionsTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="tableEmptyState" style="display: none;">
+              <i data-lucide="inbox" class="empty-icon"></i>
+              <h4>No Transactions Found</h4>
+              <p>Try refining your search or add a new transaction to get started.</p>
+              <button class="btn btn-primary" id="btnEmptyStateAdd">
+                <i data-lucide="plus"></i>
+                <span>Add Transaction</span>
+              </button>
+            </div>
+            
+            <!-- Table Pagination -->
+            <div class="pagination-container" id="paginationControls">
+              <span class="pagination-info" id="paginationInfo">Showing 1-10 of 25 transactions</span>
+              <div class="pagination-buttons">
+                <button class="btn btn-icon-only btn-secondary" id="btnPrevPage" aria-label="Previous page">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <div class="page-numbers" id="pageNumbersContainer">
+                  <!-- Page buttons generated here -->
+                </div>
+                <button class="btn btn-icon-only btn-secondary" id="btnNextPage" aria-label="Next page">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+        </section>
+        
+        <!-- ================= BUDGET SETTINGS TAB ================= -->
+        <section class="tab-content" id="tabBudgetSettings">
+          
+          <div class="settings-grid">
+            
+            <!-- Budget Threshold Configuration -->
+            <div class="settings-card glass-panel">
+              <div class="settings-card-header">
+                <i data-lucide="piggy-bank" class="settings-icon text-violet"></i>
+                <div>
+                  <h3>Monthly Budget Limit</h3>
+                  <p class="subtitle">Set your maximum spending threshold per month</p>
+                </div>
+              </div>
+              
+              <form id="budgetSettingsForm" class="settings-form">
+                <div class="form-group">
+                  <label for="inputBudgetLimit">Monthly Budget Limit (<span class="currency-label">₹</span>)</label>
+                  <div class="input-prefix-wrapper">
+                    <span class="input-prefix">₹</span>
+                    <input type="number" id="inputBudgetLimit" class="form-input" min="0" step="1" placeholder="1000">
+                  </div>
+                  <p class="form-help">Enter 0 to disable monthly budget tracking.</p>
+                </div>
+                
+                <div class="form-group">
+                  <label for="inputAlertThreshold">Alert Threshold (%)</label>
+                  <select id="inputAlertThreshold" class="select-input">
+                    <option value="50">50% of budget reached</option>
+                    <option value="75">75% of budget reached</option>
+                    <option value="85" selected>85% of budget reached</option>
+                    <option value="90">90% of budget reached</option>
+                    <option value="100">100% of budget reached</option>
+                  </select>
+                  <p class="form-help">You'll receive a dashboard warning when your expenses reach this limit.</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="inputCurrency">App Currency</label>
+                  <select id="inputCurrency" class="select-input">
+                    <option value="INR" selected>INR (₹) - Indian Rupee</option>
+                    <option value="USD">USD ($) - US Dollar</option>
+                    <option value="EUR">EUR (€) - Euro</option>
+                    <option value="GBP">GBP (£) - Pound Sterling</option>
+                    <option value="JPY">JPY (¥) - Japanese Yen</option>
+                  </select>
+                  <p class="form-help">Select the base currency displayed across the app dashboard.</p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+              </form>
+            </div>
+            
+            <!-- Data Management -->
+            <div class="settings-card glass-panel">
+              <div class="settings-card-header">
+                <i data-lucide="database" class="settings-icon text-rose"></i>
+                <div>
+                  <h3>Data Operations</h3>
+                  <p class="subtitle">Import, export, or clear your transaction data</p>
+                </div>
+              </div>
+              
+              <div class="data-operations-content">
+                <div class="op-item">
+                  <div class="op-info">
+                    <h4>Export Backup</h4>
+                    <p>Download your transaction data as a standard CSV spreadsheet file.</p>
+                  </div>
+                  <button class="btn btn-secondary" id="btnExportCSV2">
+                    <i data-lucide="download"></i>
+                    <span>Export</span>
+                  </button>
+                </div>
+                
+                <div class="op-item">
+                  <div class="op-info">
+                    <h4>Import Backup</h4>
+                    <p>Upload a previously exported CSV file to restore your entries.</p>
+                  </div>
+                  <button class="btn btn-secondary" id="btnTriggerImport2">
+                    <i data-lucide="upload"></i>
+                    <span>Import</span>
+                  </button>
+                </div>
+                
+                <hr class="divider">
+                
+                <div class="op-item danger-zone">
+                  <div class="op-info">
+                    <h4 class="text-rose">Factory Reset</h4>
+                    <p>Permanently erase all transaction data and settings. This action is irreversible.</p>
+                  </div>
+                  <button class="btn btn-danger" id="btnResetData">
+                    <i data-lucide="trash-2"></i>
+                    <span>Delete All Data</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          
+        </section>
+        
+      </div>
+      
+    </main>
+  </div>
+  
+  <!-- ================= TRANSACTION MODAL (ADD / EDIT) ================= -->
+  <div class="modal-overlay" id="transactionModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitleText">Add New Transaction</h3>
+        <button class="modal-close-btn" id="btnCancelModal" aria-label="Close modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <form id="transactionForm">
+        <input type="hidden" id="txId">
+        
+        <div class="modal-body">
+          
+          <!-- Type Toggle -->
+          <div class="form-group">
+            <label class="form-label-bold">Transaction Type</label>
+            <div class="type-toggle-group">
+              <input type="radio" id="typeExpense" name="txType" value="expense" checked>
+              <label for="typeExpense" class="toggle-btn toggle-expense">
+                <i data-lucide="arrow-up-right"></i>
+                <span>Expense</span>
+              </label>
+              
+              <input type="radio" id="typeIncome" name="txType" value="income">
+              <label for="typeIncome" class="toggle-btn toggle-income">
+                <i data-lucide="arrow-down-left"></i>
+                <span>Income</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Amount -->
+          <div class="form-group">
+            <label for="txAmount">Amount (<span class="currency-label">₹</span>) <span class="required">*</span></label>
+            <div class="input-prefix-wrapper amount-wrapper">
+              <span class="input-prefix">₹</span>
+              <input type="number" id="txAmount" class="form-input text-lg" min="0.01" step="0.01" required placeholder="0.00">
+            </div>
+          </div>
+          
+          <!-- Grid for Date & Category -->
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="txDate">Date <span class="required">*</span></label>
+              <input type="date" id="txDate" class="form-input" required>
+            </div>
+            
+            <div class="form-group col-6">
+              <label for="txCategory">Category <span class="required">*</span></label>
+              <select id="txCategory" class="select-input" required>
+                <!-- Dynamically populated depending on selected type -->
+              </select>
+            </div>
+          </div>
+          
+          <!-- Description -->
+          <div class="form-group">
+            <label for="txDescription">Description / Vendor <span class="required">*</span></label>
+            <input type="text" id="txDescription" class="form-input" required placeholder="e.g. Grocery, Salary payment" maxlength="80">
+          </div>
+          
+          <!-- Notes -->
+          <div class="form-group">
+            <label for="txNotes">Notes (Optional)</label>
+            <textarea id="txNotes" class="form-input textarea-input" rows="2" placeholder="Add additional details..." maxlength="200"></textarea>
+          </div>
+          
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelForm">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- ================= RESET / DELETE CONFIRMATION MODAL ================= -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Are you absolutely sure?</h3>
+      </div>
+      <div class="modal-body">
+        <p id="confirmModalText">This action will delete this transaction forever. This cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelConfirm">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btnApproveConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- Javascript Source -->
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
