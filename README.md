@@ -50,7 +50,7 @@ AuraBudget is a sleek, premium, and fully responsive **Personal Finance & Budget
 
 Follow these simple steps to run AuraBudget on your local machine:
 
-> Note: The GitHub repository page shows the source code only. To use the app in a browser, run it locally with Vite or open the deployed Netlify link.
+> Note: The GitHub repository page shows the source code only. To use the app in a browser, run it locally with Vite or open the deployed Vercel link: https://azentrix-fullstack-task2-omega.vercel.app/login
 
 ### 1. Prerequisites
 Ensure you have [Node.js](https://nodejs.org/) (version 16 or newer) installed.
