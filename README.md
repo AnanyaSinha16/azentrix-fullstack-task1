@@ -50,6 +50,8 @@ AuraBudget is a sleek, premium, and fully responsive **Personal Finance & Budget
 
 Follow these simple steps to run AuraBudget on your local machine:
 
+> Note: The GitHub repository page shows the source code only. To use the app in a browser, run it locally with Vite or open the deployed Netlify link.
+
 ### 1. Prerequisites
 Ensure you have [Node.js](https://nodejs.org/) (version 16 or newer) installed.
 
@@ -59,11 +61,22 @@ Open your terminal in the project directory and install the developer dependenci
 npm install
 ```
 
+On Windows PowerShell, if `npm` is blocked by the execution policy, use:
+```powershell
+npm.cmd install
+```
+
 ### 3. Run the Development Server
 Launch Vite's local dev server:
 ```bash
 npm run dev
 ```
+
+On Windows PowerShell, use:
+```powershell
+npm.cmd run dev
+```
+
 The application will launch automatically in your default browser at **`http://localhost:3000`**. If it doesn't open automatically, navigate to that URL in your browser.
 
 ### 4. Build for Production
