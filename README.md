@@ -108,10 +108,13 @@ A focused, modal form allowing details input for description, category selection
 ![Transaction Modal Form](screenshots/transaction_form.png)
 
 ### 3. Interactive Success Notification
-Clean notifications alert the user of successful addition, edits, imports, or budget warning events:
-![Toast Notification](screenshots/transaction_added_success.png)
+Clean notifications alert the user of successful addition, edits, imports, or budget warning events.
 
 ---
+## Live Link : https://endearing-cendol-c6434a.netlify.app/
+
+---
+
 
 ## 📄 License
 This project is open-source. Feel free to use, modify, and distribute as desired.
